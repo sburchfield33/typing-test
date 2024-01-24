@@ -42,7 +42,7 @@ export default function Main() {
     })
       .then((res) => res.json())
       .then((quote) => setQuote(quote[0].quote));
-      beginNewGame();
+    beginNewGame();
   }
 
   function nextWord() {
@@ -56,6 +56,7 @@ export default function Main() {
       inputRef.current.value = "";
     }
   }
+
   return (
     <div className="h-screen" onClick={focusInput}>
       {!gameFinished && (
@@ -69,6 +70,23 @@ export default function Main() {
                   key={wordIndex}
                 >
                   {Array.from(word).map((value, index) => {
+                    /* 
+                      * Note important, this if statement
+                      * deals with the case of the last word in 
+                      * the quote so that the test can end immediately after the 
+                      * final character has been typed, not after an extra space 
+                      * at the end.
+                    */
+                    if (
+                      activeWord == quoteArr.length - 1 &&
+                      currWordInput == quoteArr[quoteArr.length - 1] &&
+                      !error
+                    ) {
+                      nextWord();
+                    }
+
+
+
                     if (currWordInput[index] == value) {
                       return (
                         <span className="border-x-2 opacity-30" key={index}>
@@ -193,7 +211,9 @@ export default function Main() {
           Begin a new typing game with the same words
         </button>
       )}
-      {gameFinished && <button onClick={getQuote}>Change the quote you are typing</button>}
+      {gameFinished && (
+        <button onClick={getQuote}>Change the quote you are typing</button>
+      )}
     </div>
   );
 }
