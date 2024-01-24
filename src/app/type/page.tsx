@@ -1,5 +1,6 @@
 "use client";
 
+import NewQuoteButton from "@/components/NewQuoteButtons";
 import Typer from "@/components/Typer";
 import { useState, useRef } from "react";
 
@@ -25,13 +26,30 @@ export default function Main() {
     }
   }
 
+  function beginNewGame() {
+    setGameFinished(false);
+    setWordsTyped(0);
+    setActiveWord(0);
+    console.log(gameFinished);
+  }
+
+  async function getQuote() {
+    await fetch("https://api.api-ninjas.com/v1/quotes?category=", {
+      headers: {
+        "X-Api-Key": "qcqfQblrmvj2NdzmgUtq0g==vuuViBuKa9S28JOQ",
+      },
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((quote) => setQuote(quote[0].quote));
+      beginNewGame();
+  }
+
   function nextWord() {
     setWordsTyped(activeWord + 1);
     setCurrWordInput("");
     setActiveWord(activeWord + 1);
-    console.log(activeWord);
     if (activeWord == quoteArr.length - 1) {
-      console.log("In here");
       setGameFinished(true);
     }
     if (inputRef.current != null) {
@@ -170,6 +188,12 @@ export default function Main() {
         </div>
       )}
       <div> The amount of words you have typed {wordsTyped} </div>
+      {gameFinished && (
+        <button onClick={beginNewGame}>
+          Begin a new typing game with the same words
+        </button>
+      )}
+      {gameFinished && <button onClick={getQuote}>Change the quote you are typing</button>}
     </div>
   );
 }
